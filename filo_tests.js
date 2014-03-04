@@ -32,6 +32,9 @@ describe("Filo", function() {
     var correctTemplate = "<div id='top'><div id='middle'><div id='bottom'>myVarString</div></div></div>";
 
     var result = F.render(rootID, template, overrides);
+    
+    expect(result).not.toBe(null);
+    
     result = result.outerHTML.replace(/\"/g,"'");
 
     expect(result).toMatch(correctTemplate);
