@@ -22,15 +22,15 @@ var F = (function () {
             return null;
         }
 
-        if(node instanceof jQuery){     // If jQuery obj, fetch the Element object
+        if(isInstanceOf(node, [jQuery])){     // If jQuery obj, fetch the Element object
             node = node[0];
         }
 
-        if(node instanceof Element){    // Make sure node is an Element object
+        if(isInstanceOf(node, [Element])){    // Make sure node is an Element object
             return node.outerHTML;
-        }else{
-            return null;
         }
+    
+        return null;
     }
 
     function parseNode(node, template, overrides){
@@ -59,12 +59,14 @@ var F = (function () {
                 var tagNode = $('#' + tag, template)[0];
 
                 if(tagNode === undefined){
+                    console.error("Filo: No template with id: " + tag);
                     return null;
                 }
 
                 var parsedNode = parseNode(tagNode, template, overrides);
 
                 if(parsedNode === null){
+                    console.error("Filo: Could not parse node: " + outerHTMLForNode(tagNode) + "\nwith template:" + outerHTMLForNode(template));
                     return null;
                 }
 
@@ -77,23 +79,48 @@ var F = (function () {
         return node;
     }
 
+    function isInstanceOf(obj, instanceTypes) {
+        var result = false;
+
+        if(obj === undefined || instanceTypes === undefined){
+            return result;
+        }
+
+        instanceTypes = ( instanceTypes instanceof Array ? instanceTypes : [instanceTypes]);
+
+        for(var i = 0; i < instanceTypes.length; i++) {
+            result = (obj instanceof instanceTypes[i] ? true : result);
+        }
+
+        return result;
+    }
+
+    function isTypeOf(obj, types) {
+        var result = false;
+
+        if(obj === undefined || types === undefined){
+            return result;
+        }
+
+        types = ( types instanceof Array ? types : [types]);
+
+        for(var i = 0; i < types.length; i++) {
+            result = (typeof obj === types[i] ? true : result);
+        }
+
+        return result;
+    }
+
     return {
         render: function (rootID, template, overrides) {
             // Sanity check
-
-            if((rootID === undefined) || (template === undefined)){
+            if((isInstanceOf(template, [Element, jQuery, String]) || isTypeOf(template, 'string')) === false){
+                console.error("Filo: template is not of type Element, jQuery, or String");
                 return null;
             }
 
-            if( ((rootID instanceof String) || (typeof rootID === 'string')) === false){
-                return null;
-            }
-
-
-            if(((template instanceof Element)  ||
-                (template instanceof jQuery)   ||
-                (template instanceof String)   ||
-                (typeof template === 'string')) === false){
+            if((isInstanceOf(rootID, [String]) || isTypeOf(rootID, 'string')) === false){
+                console.error("Filo: rootID is not of type String");
                 return null;
             }
 
