@@ -175,4 +175,46 @@ describe("Filo", function() {
 
     expect(result).toMatch(correctTemplate);
   });
+
+  it("should return null if rootID is a zero-length string", function() {
+    var rootID = '';
+    var template = "<div id='top'>{{middle}}</div>" +
+    "<div id='middle'>{{bottom}}</div>" +
+    "<div id='bottom'>Bottom Div</div>";
+
+    var result = F.render(rootID, template);
+
+    expect(result).toBe(null);
+  });
+
+  it("should return null if template is a zero-length string", function() {
+    var rootID = 'filo-root';
+    var template = "";
+
+    var result = F.render(rootID, template);
+
+    expect(result).toBe(null);
+  });
+
+  it("should return the entire parsed template when given the rootID: filo-root", function() {
+    var rootID = 'filo-root';
+
+    var template = "<div id='top'>{{middle}}</div>" +
+    "<div id='middle'>{{bottom}}</div>" +
+    "<div id='bottom'>{{myVar}}</div>";
+
+    var overrides = {
+      myVar: "myVarString"
+    };
+
+    var correctTemplate = '<div id="filo-root"><div id="top"><div id="middle"><div id="bottom">myVarString</div></div></div><div id="middle"><div id="bottom">myVarString</div></div><div id="bottom">myVarString</div></div>';
+
+    var result = F.render(rootID, template, overrides);
+
+    expect(result).not.toBe(null);
+    
+    result = result.outerHTML.replace(/\'/g,'"');
+
+    expect(result).toMatch(correctTemplate);
+  });
 });
