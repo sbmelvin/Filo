@@ -66,7 +66,7 @@ var F = (function () {
                 var parsedNode = parseNode(tagNode, template, overrides);
 
                 if(parsedNode === null){
-                    console.error("Filo: Could not parse node: " + outerHTMLForNode(tagNode) + "\nwith template:" + outerHTMLForNode(template));
+                    console.error("Filo: Could not parse node: " + outerHTMLForNode(tagNode));
                     return null;
                 }
 
@@ -124,12 +124,22 @@ var F = (function () {
                 return null;
             }
 
+            if(!rootID.length || !template.length){
+                return null;
+            }
+
             overrides = overrides || {};
 
             // Encapsulate template in div and place into jQuery object
-            template = $('<div>').append(template);
+            template = $('<div id="filo-root">').append(template);
+            
+            var rootNode = null;
 
-            var rootNode = $('#' + rootID, template)[0];
+            if(rootID === 'filo-root'){
+                rootNode = template[0];
+            }else{
+                rootNode = $('#' + rootID, template)[0];
+            }
 
             return parseNode(rootNode, template, overrides);
         }
