@@ -1,4 +1,5 @@
 var F = (function () {
+    'use strict';
 
     function tagsInNode(node) {
         var regex = /{{([^{^}]+)}}/g;
@@ -89,7 +90,13 @@ var F = (function () {
         instanceTypes = ( instanceTypes instanceof Array ? instanceTypes : [instanceTypes]);
 
         for(var i = 0; i < instanceTypes.length; i++) {
-            result = (obj instanceof instanceTypes[i] ? true : result);
+            var instanceType = instanceTypes[i];
+
+            if(instanceType === Element){
+                result = obj.nodeName ? true : false;
+            }else{
+                result = (obj instanceof instanceTypes[i] ? true : result);
+            }
         }
 
         return result;
@@ -131,7 +138,7 @@ var F = (function () {
             overrides = overrides || {};
 
             // Encapsulate template in div and place into jQuery object
-            template = $('<div id="filo-root">').append(template);
+            template = $('<div id="filo-root"></div>').append(template);
             
             var rootNode = null;
 
