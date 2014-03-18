@@ -52,7 +52,7 @@ var myPost = F.render('post', template, {
 
 Note: If Filo encounters a template tag that cannot be resolved to an html ID or override key, the render will fail.
 
-Faq?
+#FAQ
 
 **Q**) This looks like Mustache.js, how is this not Mustache.js?
 
