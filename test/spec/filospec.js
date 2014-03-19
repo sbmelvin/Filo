@@ -199,7 +199,7 @@ describe("Filo", function() {
   it("should return the entire parsed template when given the rootID: filo-root", function() {
     var rootID = 'filo-root';
 
-    var template = "<div id='top'>{{middle}}</div>" +
+    var template = "<!-- <div id='outside'>{{top}}</div> --><div id='top'>{{middle}}</div>" +
     "<div id='middle'>{{bottom}}</div>" +
     "<div id='bottom'>{{myVar}}</div>";
 
@@ -207,14 +207,15 @@ describe("Filo", function() {
       myVar: "myVarString"
     };
 
-    var correctTemplate = '<div id="filo-root"><div id="top"><div id="middle"><div id="bottom">myVarString</div></div></div><div id="middle"><div id="bottom">myVarString</div></div><div id="bottom">myVarString</div></div>';
+    var correctTemplate = '<div id="filo-root"><!-- <div id="outside">' + escape('{{top}}') + '</div> --><div id="top"><div id="middle"><div id="bottom">myVarString</div></div></div><div id="middle"><div id="bottom">myVarString</div></div><div id="bottom">myVarString</div></div>';
 
     var result = F.render(rootID, template, overrides);
 
     expect(result).not.toBe(null);
     
     result = result.outerHTML.replace(/\'/g,'"');
-
+    console.log(result);
+    console.log(correctTemplate);
     expect(result).toMatch(correctTemplate);
   });
 });
