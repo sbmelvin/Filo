@@ -18,6 +18,19 @@ var F = (function () {
         return matches;
     }
 
+    function escapeTagsInComments(str) {
+        var regex = /<!--[^{^}]*({{[^{^}]+}})[^{^}]*-->/g;
+        var match = regex.exec(str);
+
+        while(match) {
+            str.replace(match[1], escape(match[1]));
+            console.log(match[1], escape(match[1]), str);
+            match = regex.exec(str);
+        }
+
+        return str;
+    }
+
     function outerHTMLForNode(node) {
         if(node === undefined){
             return null;
@@ -58,7 +71,6 @@ var F = (function () {
                 replaceFunc = overrideReplace;
             }else{
                 var tagNode = $('#' + tag, template)[0];
-
                 if(tagNode === undefined){
                     console.error("Filo: No template with id: " + tag);
                     return null;
@@ -67,7 +79,7 @@ var F = (function () {
                 var parsedNode = parseNode(tagNode, template, overrides);
 
                 if(parsedNode === null){
-                    console.error("Filo: Could not parse node: " + outerHTMLForNode(tagNode));
+                    console.error("Filo: Could not parse node with id: " + tag);
                     return null;
                 }
 
@@ -139,7 +151,8 @@ var F = (function () {
 
             // Encapsulate template in div and place into jQuery object
             template = $('<div id="filo-root"></div>').append(template);
-            
+            template = escapeTagsInComments(template);
+
             var rootNode = null;
 
             if(rootID === 'filo-root'){
