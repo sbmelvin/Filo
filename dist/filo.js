@@ -18,17 +18,15 @@ var F = (function () {
         return matches;
     }
 
-    function escapeTagsInComments(str) {
-        var regex = /<!--[^{^}]*({{[^{^}]+}})[^{^}]*-->/g;
-        var match = regex.exec(str);
-
-        while(match) {
-            str.replace(match[1], escape(match[1]));
-            console.log(match[1], escape(match[1]), str);
-            match = regex.exec(str);
-        }
-
-        return str;
+    // Escapes template tags within html comments
+    function removeComments(template) {
+        // Template tag within an html comment regex
+        var regex = /<!--.*-->/g;
+        
+        var str = template.html().replace(regex, "");
+        template.html(str);
+        
+        return template;
     }
 
     function outerHTMLForNode(node) {
@@ -67,9 +65,10 @@ var F = (function () {
             var replaceFunc = null;
 
             // Check to see if the tag has an override, otherwise parse the tag.
-            if(overrides.hasOwnProperty(tag)){
+            if(overrides.hasOwnProperty(tag)) {
                 replaceFunc = overrideReplace;
-            }else{
+            }
+            else {
                 var tagNode = $('#' + tag, template)[0];
                 if(tagNode === undefined){
                     console.error("Filo: No template with id: " + tag);
@@ -151,7 +150,7 @@ var F = (function () {
 
             // Encapsulate template in div and place into jQuery object
             template = $('<div id="filo-root"></div>').append(template);
-            template = escapeTagsInComments(template);
+            template = removeComments(template);
 
             var rootNode = null;
 
@@ -161,7 +160,14 @@ var F = (function () {
                 rootNode = $('#' + rootID, template)[0];
             }
 
-            return parseNode(rootNode, template, overrides);
+            var parsedTemplate = parseNode(rootNode, template, overrides);
+
+            if(parsedTemplate) {
+                return outerHTMLForNode(parsedTemplate);
+            }
+            else {
+                return null;
+            }
         }
     };
 })();
