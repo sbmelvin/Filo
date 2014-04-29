@@ -2,7 +2,7 @@ var F = (function () {
     'use strict';
 
     function tagsInNode(node) {
-        var regex = /{{([^{^}]+)}}/g;
+        var regex = /{{([^{^}]+)}}/g
 
         var matches = [];
         
@@ -18,17 +18,15 @@ var F = (function () {
         return matches;
     }
 
-    function escapeTagsInComments(str) {
-        var regex = /<!--[^{^}]*({{[^{^}]+}})[^{^}]*-->/g;
-        var match = regex.exec(str);
+    // Escapes template tags within html comments
+    function removeComments(template) {
+        // Template tag within an html comment regex
+        var regex = /<!--[\s\S]*?-->/g;
 
-        while(match) {
-            str.replace(match[1], escape(match[1]));
-            console.log(match[1], escape(match[1]), str);
-            match = regex.exec(str);
-        }
-
-        return str;
+        var str = template.html();
+        template.html(str.replace(regex, ""));
+        
+        return template;
     }
 
     function outerHTMLForNode(node) {
@@ -64,12 +62,14 @@ var F = (function () {
 
         for(var i = 0; i < tags.length; i++){
             var tag = tags[i];
+
             var replaceFunc = null;
 
             // Check to see if the tag has an override, otherwise parse the tag.
-            if(overrides.hasOwnProperty(tag)){
+            if(overrides.hasOwnProperty(tag)) {
                 replaceFunc = overrideReplace;
-            }else{
+            }
+            else {
                 var tagNode = $('#' + tag, template)[0];
                 if(tagNode === undefined){
                     console.error("Filo: No template with id: " + tag);
@@ -151,17 +151,13 @@ var F = (function () {
 
             // Encapsulate template in div and place into jQuery object
             template = $('<div id="filo-root"></div>').append(template);
-            template = escapeTagsInComments(template);
+            template = removeComments(template);
 
-            var rootNode = null;
+            var rootNode = (rootID === 'filo-root' ? template[0] : $('#' + rootID, template)[0]);
 
-            if(rootID === 'filo-root'){
-                rootNode = template[0];
-            }else{
-                rootNode = $('#' + rootID, template)[0];
-            }
+            var parsedTemplate = parseNode(rootNode, template, overrides);
 
-            return parseNode(rootNode, template, overrides);
+            return (parsedTemplate ? outerHTMLForNode(parsedTemplate) : null);
         }
     };
 })();
