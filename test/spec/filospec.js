@@ -1,7 +1,10 @@
-describe("Filo", function() {
+function formatHTML(html) {
+  var ele = document.createElement('div');
+  ele.innerHTML = html;
+  return ele.innerHTML;
+}
 
-  beforeEach(function() {
-  });
+describe("Filo", function() {
 
   it("should return null if not given a rootID or template", function() {
     var result = F.render();
@@ -21,22 +24,20 @@ describe("Filo", function() {
   it("should return the correct template when given a valid rootID and template", function() {
     var rootID = 'top';
 
-    var template = "<div id='top'>{{middle}}</div>" +
-    "<div id='middle'>{{bottom}}</div>" +
-    "<div id='bottom'>{{myVar}}</div>";
+    var template =  "<div id='top'>{{middle}}</div>" +
+                    "<div id='middle'>{{bottom}}</div>" +
+                    "<div id='bottom'>{{myVar}}</div>";
 
     var overrides = {
       myVar: "myVarString"
     };
 
-    var correctTemplate = "<div id='top'><div id='middle'><div id='bottom'>myVarString</div></div></div>";
+    var correctTemplate = formatHTML("<div id='top'><div id='middle'><div id='bottom'>myVarString</div></div></div>");
 
     var result = F.render(rootID, template, overrides);
     
     expect(result).not.toBe(null);
     
-    result = result.outerHTML.replace(/\"/g,"'");
-
     expect(result).toMatch(correctTemplate);
   });
 
@@ -168,10 +169,9 @@ describe("Filo", function() {
     "<div id='middle'>{{bottom}}</div>" +
     "<div id='bottom'>Bottom Div</div>";
     
-    var correctTemplate = "<div id='top'><div id='middle'><div id='bottom'>Bottom Div</div></div></div>";
+    var correctTemplate = formatHTML("<div id='top'><div id='middle'><div id='bottom'>Bottom Div</div></div></div>");
 
     var result = F.render(rootID, template);
-    result = result.outerHTML.replace(/\"/g,"'");
 
     expect(result).toMatch(correctTemplate);
   });
@@ -199,21 +199,32 @@ describe("Filo", function() {
   it("should return the entire parsed template when given the rootID: filo-root", function() {
     var rootID = 'filo-root';
 
-    var template = "<!-- <div id='outside'>{{top}}</div> --><div id='top'>{{middle}}</div>" +
-    "<div id='middle'>{{bottom}}</div>" +
-    "<div id='bottom'>{{myVar}}</div>";
+    var template =  "<!-- <div id='outside'>{{top}}</div> -->" +
+                    "<div id='top'>{{middle}}</div>" +
+                    "<div id='middle'>{{bottom}}</div>" +
+                    "<div id='bottom'>{{myVar}}</div>";
 
     var overrides = {
       myVar: "myVarString"
     };
 
-    var correctTemplate = '<div id="filo-root"><!-- <div id="outside">' + escape('{{top}}') + '</div> --><div id="top"><div id="middle"><div id="bottom">myVarString</div></div></div><div id="middle"><div id="bottom">myVarString</div></div><div id="bottom">myVarString</div></div>';
+    var correctTemplate = formatHTML('<div id="filo-root">' +
+                          '<div id="top"><div id="middle"><div id="bottom">myVarString</div></div></div>' +
+                          '<div id="middle"><div id="bottom">myVarString</div></div>' +
+                          '<div id="bottom">myVarString</div></div>');
 
     var result = F.render(rootID, template, overrides);
 
-    expect(result).not.toBe(null);
-    
-    result = result.outerHTML.replace(/\'/g,'"');
+    expect(result).toMatch(correctTemplate);
+  });
+
+  it("should remove HTML comments and therefore ignore template tags within comments", function() {
+    var template =  "<div id='hasComment'>{{beforeComment}}<!-- {{middle}} -->{{afterComment}}</div>" +
+                    "<div id='beforeComment'>There shouldn't be a comment between this --></div>" +
+                    "<div id='afterComment'><-- and this.</div>";
+
+    var correctTemplate = formatHTML("<div id='hasComment'><div id='beforeComment'>There shouldn't be a comment between this --&gt;</div><div id='afterComment'>&lt;-- and this.</div></div>");
+    var result = F.render('hasComment', template);
     console.log(result);
     console.log(correctTemplate);
     expect(result).toMatch(correctTemplate);
