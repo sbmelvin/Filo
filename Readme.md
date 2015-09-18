@@ -55,6 +55,10 @@ var myPost = F.render('post', template, {
 
 #FAQ
 
+**Q**) Why?
+
+**A**) Filo was made to keep long HTML strings out of JS.
+
 **Q**) This looks like Mustache.js, how is this not Mustache.js?
 
 **A**) Filo is not a replacement for Mustache.js, but uses the same tag syntax so developers can easily migrate to Mustache.js if they need a more-powerful templating system. Filo allows developers to build html by writing reusable html nodes that are linked together by html ids and template tags. 
