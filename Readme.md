@@ -1,5 +1,5 @@
 ## Filo
-#### id-based html templates
+#### ID-based HTML Templates
 
 Filo does one thing. It replaces tags in the form of `{{tag_name}}` within the provided template with the html element whose html ID matches `tag_name` or with a value from an 'override' object.
 
