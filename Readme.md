@@ -53,7 +53,7 @@ var myPost = F.render('post', template, {
 
 *If Filo encounters a template tag that cannot be resolved to an html ID or override key, the render will fail.*
 
-#FAQ
+## FAQ
 
 **Q**) Why?
 
